@@ -6,13 +6,13 @@ description: "Elabora propostas comerciais a partir da URL de um projeto publica
 # Elaboração de Propostas Comerciais na Workana
 
 ## Quando usar
-- Quando o pedido trouxer o texto de um projeto publicado na Workana (junto com a URL de referência) e pedir proposta, orçamento ou resposta comercial.
+- Quando o pedido trouxer a URL de um projeto publicado na Workana e pedir proposta, orçamento ou resposta comercial (o texto colado pelo humano é opcional).
 - Quando o pedido pedir o PDF da proposta.
 - Quando for preciso revisar uma proposta já escrita para um projeto da Workana.
 Não use esta skill para negociar valores ou condições fora da plataforma, nem para executar o serviço contratado.
 ## Passo a passo
-1. **Confirme a entrada.** A entrada principal é o texto do projeto colado pelo humano (título, descrição, orçamento, prazo e, se houver, dados do contratante). Peça também a URL do projeto na Workana (domínio [workana.com](http://workana.com) com caminho de projeto), que serve como referência para citar no PDF e no nome do arquivo. O porquê: as páginas de projetos na Workana exigem login para exibir os dados completos, de modo que a proposta depende do texto colado pelo usuário.
-2. **Obtenha os dados do projeto.** Use o texto colado como fonte dos dados. Só tente ler a URL com firecrawl_scrape se o texto não vier; se a leitura trouxer só a página de login, pare e peça ao humano para colar o texto do projeto, sem inventar dados. Se faltar orçamento ou prazo no texto, escreva a proposta assim mesmo, marcando esses campos como "a confirmar", e liste-os nas lacunas. O porquê: a proposta precisa refletir o que o cliente de fato publicou, sem suposições.
+1. **Confirme a entrada.** A entrada principal é a URL do projeto na Workana (domínio [workana.com](http://workana.com) com caminho de projeto). O texto do projeto colado pelo humano é opcional e serve para completar ou corrigir o que a página não mostrar. O porquê: a página de projeto da Workana é pública e não exige login, concentrando as informações necessárias para a proposta.
+2. **Obtenha os dados do projeto.** Leia a URL do projeto com firecrawl_scrape usando formats ["markdown"] e onlyMainContent: false (a página inteira). Da página vêm título, descrição, categoria, porte, prazo (delivery term), habilidades exigidas, dados do contratante (projetos publicados, projetos pagos, membro desde) e atividade (número de propostas e interessados). Se o humano tiver fornecido texto colado, use-o para completar ou corrigir o que a página não mostrar. O orçamento normalmente não aparece na página pública: se não vier no texto informado pelo humano, escreva a proposta com o valor "a confirmar" e liste nas lacunas. Só se a leitura vier sem a descrição do projeto (falha da leitura), pare e peça ao humano o texto do projeto, sem inventar dados. O porquê: a proposta precisa refletir o que o cliente de fato publicou, sem suposições.
 3. **Verifique a aderência e o histórico.** Compare o projeto com as competências que você entrega. Se o projeto estiver fora do nicho ou o contratante tiver histórico ruim, informe o motivo e recomende não enviar, ou enviar com escopo mais protegido. O porquê: enviar menos propostas, mas mais direcionadas, converte melhor.
 4. **Diagnostique a necessidade.** Identifique a dor principal, o resultado esperado e as dúvidas em aberto. Liste de duas a três perguntas que ajudariam a fechar o escopo. O porquê: mostrar leitura atenta do projeto pesa mais que qualquer afirmação genérica.
 5. **Consulte a base apenas para completar lacunas.** Use a base aprovada da Agenticon para padrões de escopo, prazo e precificação que o projeto não cobre. Cite título e data de aprovação. Se a base contradisser uma diretriz deste guia, siga a diretriz.
@@ -39,14 +39,10 @@ Não use esta skill para negociar valores ou condições fora da plataforma, nem
 - Lista curta com os pontos fortes da abordagem.
 - Lacunas: informações do projeto que faltaram e, se for o caso, o motivo de o PDF não ter sido gerado.
 ## Exemplo
-Pedido: "Faça a proposta em PDF para este projeto da Workana (link: [https://www.workana.com/job/exemplo-de-projeto](https://www.workana.com/job/exemplo-de-projeto)):
-Título: Atendimento automatizado no site
-Descrição: Precisamos integrar um bot de atendimento no nosso site institucional.
-Orçamento: R$ 1.500
-Prazo: 2 semanas"
-Entrega esperada: arquivo proposta-exemplo-de-projeto.pdf, com a proposta completa, e resumo: "Projeto de atendimento automatizado no site, orçamento e prazo obtidos do texto informado. Pontos fortes: escopo em etapas, entregáveis claros e próximo passo definido. Lacunas: volume mensal de atendimentos não informado no projeto."
+Pedido: "Faça a proposta em PDF para este projeto da Workana: [https://www.workana.com/job/exemplo-de-projeto](https://www.workana.com/job/exemplo-de-projeto)"
+Entrega esperada: leitura da URL com firecrawl_scrape (formats: ["markdown"], onlyMainContent: false), arquivo proposta-exemplo-de-projeto.pdf com a proposta completa e resumo: "Projeto de atendimento automatizado no site, dados obtidos da página do projeto. Pontos fortes: escopo em etapas, entregáveis claros e próximo passo definido. Lacunas: orçamento não informado na página pública (definido como a confirmar)."
 ## Critérios de qualidade
-- O texto colado pelo humano foi usado como fonte primária dos dados, e a URL foi usada como referência no PDF e no nome do arquivo.
+- A URL do projeto foi usada como entrada principal e lida com firecrawl_scrape usando formats ["markdown"] e onlyMainContent: false (se fornecido texto colado, serviu de apoio para complementar ou corrigir).
 - Se faltaram orçamento ou prazo, foram marcados como "a confirmar" na proposta e registrados nas lacunas.
 - A proposta mostra que o escopo foi lido com atenção.
 - Cada entregável é concreto e verificável.
